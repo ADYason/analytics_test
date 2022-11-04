@@ -1,0 +1,292 @@
+{
+  "info": {
+    "title": "Проект по поиску текста",
+    "version": "0.1.0"
+  },
+  "tags": [],
+  "paths": {
+    "/api/create_indice": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/create_indece"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Индекс уже создан": {
+                    "value": {
+                      "message": "Индекс уже создан'"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Bad request"
+          }
+        },
+        "summary": "Create indice"
+      }
+    },
+    "/api/delete_indice": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/delete_indice"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Индекс уже удален или не создан": {
+                    "value": {
+                      "message": "Индекса не существует"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Bad request"
+          }
+        },
+        "summary": "Delete indice"
+      }
+    },
+    "/api/fill_indice": {
+      "get": {
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/fill_indice"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "База пуста": {
+                    "value": {
+                      "message": "База данных пуста"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Bad request"
+          }
+        },
+        "summary": "Fill indice"
+      }
+    },
+    "/api/search": {
+      "post": {
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/search_in"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/search"
+                }
+              }
+            },
+            "description": "Successful response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Отсутсвует тело запроса": {
+                    "value": {
+                      "message": "Отсутствует тело запроса"
+                    }
+                  },
+                  "Отсутсвует поле text": {
+                    "value": {
+                      "message": "text является обязательным полем"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Совпадения не найдены": {
+                    "value": {
+                      "message": "Ничего не найдено"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/file/{pk}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pk",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": null,
+            "description": "Successful response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Id не в эластике": {
+                    "value": {
+                      "message": "Такого id в эластике нет"
+                    }
+                  },
+                  "Id не в базе": {
+                    "value": {
+                      "message": "Такого id в базе нет"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+  "openapi": "3.0.3",
+  "components": {
+    "schemas": {
+      "Error": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "create_indece": {
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "description": "Создание индекса"
+      },
+      "delete_indice": {
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "description": "Удаление индекса"
+      },
+      "fill_indice": {
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "description": "Наполнение индекса данными"
+      },
+      "search_in": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "description": "Поиск по тексту"
+      },
+      "search": {
+        "properties": {
+          "result": {
+            "properties": {
+              "created_date": {
+                "type": "string"
+              },
+              "id": {
+                "type": "integer"
+              },
+              "rubrics": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "description": "Поиск текста"
+      }
+    }
+  }
+}
