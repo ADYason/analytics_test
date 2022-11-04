@@ -39,7 +39,7 @@ def test_indeice_delete(app_with_db):
 
 def test_indice_fill_without_data(app_with_db):
     response = app_with_db.get(
-        url_for('fill_indices'),
+        url_for('fill_indice'),
         json={}
     )
     assert response.status_code == 400
@@ -49,7 +49,7 @@ def test_indice_fill_without_data(app_with_db):
 def test_indice_fill(app_with_data):
     assert elastic_client.indices.exists(index="files") == True
     response = app_with_data.get(
-        url_for('fill_indices'),
+        url_for('fill_indice'),
         json={}
     )
     assert response.status_code == 201
@@ -75,7 +75,7 @@ def test_search(app_with_data):
     )
     assert response.status_code == 404 and response.json == {'message': 'Ничего не найдено'}
     app_with_data.get(
-        url_for('fill_indices'),
+        url_for('fill_indice'),
         json={}
     )
     elastic_client.indices.refresh(index="files")

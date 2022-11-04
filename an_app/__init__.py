@@ -3,13 +3,7 @@ from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-
-
-class Config(object):
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URI', default='sqlite:///db.sqlite3')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv('SECRET_KEY', default='ADWADSDWASDFXCQ')
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)

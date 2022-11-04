@@ -21,17 +21,6 @@ services:
       - elasticsearch
     ports:
       - "5601:5601"
-  web:
-    container_name: web-container
-    image: adyason/an_app:latest
-    depends_on:
-      - kibana
-    env_file:
-      - .env
-    networks:
-      - es-net
-    ports:
-      - "8000:8000"
 networks:
   es-net:
     driver: bridge

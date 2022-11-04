@@ -5,13 +5,16 @@ from . import app, elastic_client, db
 from .models import FileModel
 from .error_handlers import InvalidAPIUsage
 from .mapping import MAPPING_FOR_INDEX
-from elasticsearch.exceptions import NotFoundError, RequestError, ConnectionError
+from elasticsearch.exceptions import (NotFoundError,
+                                      RequestError,
+                                      ConnectionError)
 
 try:
     ec = elastic_client
     ec.ping()
 except ConnectionError:
     raise InvalidAPIUsage('API эластика не подключено')
+
 
 @app.route('/api/create_indice', methods=['GET'])
 def create_indice():
@@ -36,7 +39,7 @@ def delete_indice():
 
 
 @app.route('/api/fill_indice', methods=['GET'])
-def fill_indices():
+def fill_indice():
     if not ec.indices.exists(index="files"):
         raise InvalidAPIUsage('Такого индекса не существует')
     files = FileModel.query.all()
@@ -64,8 +67,8 @@ def search():
     src = ec.search(index='files', query=query, size=20)
     hits = src['hits']['hits']
     if hits == []:
-       return jsonify({
-        'message': 'Ничего не найдено'
+        return jsonify({
+            'message': 'Ничего не найдено'
         }), HTTPStatus.NOT_FOUND
     pks = []
     for hit in hits:
@@ -73,7 +76,7 @@ def search():
     query = FileModel.query.filter(
         FileModel.id.in_(pks)).order_by(
             FileModel.created_date).all()
-    result=[]
+    result = []
     if query is not None:
         for file in query:
             result.append(file.to_dict())
@@ -81,16 +84,17 @@ def search():
         'result': result
     }), HTTPStatus.OK
 
+
 @app.route('/api/file/<int:pk>', methods=['DELETE'])  # type: ignore
 def file_del(pk):
     query = {"match": {"id": pk}}
     src = ec.search(index='files', query=query)
     hits = src['hits']['hits']
     if hits == []:
-       raise InvalidAPIUsage('Такого id в эластике нет', HTTPStatus.NOT_FOUND)
+        raise InvalidAPIUsage('Такого id в эластике нет', HTTPStatus.NOT_FOUND)
     del_id = hits[0]['_id']
     ec.delete(index='files', id=del_id)
-    file = FileModel.query.filter(FileModel.id==pk).first()
+    file = FileModel.query.filter(FileModel.id == pk).first()
     if file is None:
         raise InvalidAPIUsage('Такого id в базе нет', HTTPStatus.NOT_FOUND)
     db.session.delete(file)
