@@ -5,19 +5,18 @@ from . import app, elastic_client, db
 from .models import FileModel
 from .error_handlers import InvalidAPIUsage
 from .mapping import MAPPING_FOR_INDEX
+from .utils import test_es
 from elasticsearch.exceptions import (NotFoundError,
-                                      RequestError,
-                                      ConnectionError)
+                                      RequestError)
 
-try:
-    ec = elastic_client
-    ec.ping()
-except ConnectionError:
-    raise InvalidAPIUsage('API эластика не подключено')
+
+ec = elastic_client
 
 
 @app.route('/api/create_indice', methods=['GET'])
 def create_indice():
+    if not test_es():
+        raise InvalidAPIUsage('API эластика не подключено')
     try:
         ec.indices.create(index='files', mappings=MAPPING_FOR_INDEX)
     except RequestError:
@@ -29,6 +28,8 @@ def create_indice():
 
 @app.route('/api/delete_indice', methods=['GET'])
 def delete_indice():
+    if not test_es():
+        raise InvalidAPIUsage('API эластика не подключено')
     try:
         ec.indices.delete(index='files')
     except NotFoundError:
@@ -40,6 +41,8 @@ def delete_indice():
 
 @app.route('/api/fill_indice', methods=['GET'])
 def fill_indice():
+    if not test_es():
+        raise InvalidAPIUsage('API эластика не подключено')
     if not ec.indices.exists(index="files"):
         raise InvalidAPIUsage('Такого индекса не существует')
     files = FileModel.query.all()
@@ -58,6 +61,8 @@ def fill_indice():
 
 @app.route('/api/search', methods=['POST'])
 def search():
+    if not test_es():
+        raise InvalidAPIUsage('API эластика не подключено')
     data = request.get_json()
     if not data:
         raise InvalidAPIUsage('Отсутствует тело запроса')
@@ -87,6 +92,8 @@ def search():
 
 @app.route('/api/file/<int:pk>', methods=['DELETE'])  # type: ignore
 def file_del(pk):
+    if not test_es():
+        raise InvalidAPIUsage('API эластика не подключено')
     query = {"match": {"id": pk}}
     src = ec.search(index='files', query=query)
     hits = src['hits']['hits']
